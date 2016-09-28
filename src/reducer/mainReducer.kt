@@ -1,4 +1,4 @@
-
+package reducer
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
     val response = client.execute(request)
     parseEvent(response)
 
-    val fixedRateTimer = fixedRateTimer(name = "contrats-subscription",
+    val fixedRateTimer = fixedRateTimer(name = "reducer.getContrats-subscription",
             initialDelay = 0, period = 1000) {
         val request = HttpGet("http://127.0.0.1:2113/streams/\$ce-contrat/${lastNumber+1}/forward/20?embed=body")
         request.setHeader(HttpHeaders.ACCEPT, "application/json")
@@ -50,7 +50,7 @@ private fun parseEvent(response: CloseableHttpResponse) {
                 contrats.put(event.streamId, mutableMapOf());
             }
             contrats.get(event.streamId)?.putAll(contrat)
-            lastNumber= event.positionEventNumber;
+            lastNumber = event.positionEventNumber;
         }
     } else {
         throw Exception("ERROR: EventStore not working")
