@@ -1,0 +1,114 @@
+import org.gradle.plugins.ide.eclipse.model.SourceFolder
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+repositories {
+    /*http://blog.bintray.com/2014/02/11/bintray-as-pain-free-gateway-to-maven-central/*/
+    jcenter()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+ext {
+	mainClass = "inativ.api.Collect"
+}
+
+eclipse.classpath {
+    containers.clear()
+    containers.add('org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8')
+    file {
+        beforeMerged { classpath ->
+            classpath.entries.clear()
+        }
+        whenMerged { cp ->
+            cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/main/java") }*.output = "build/classes/main"
+            cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/main/resources") }*.output = "build/resources/main"
+            cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/test/java") }*.output = "build/classes/test"
+            cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/test/resources") }*.output = "build/resources/test"
+            cp.entries.removeAll { it.kind == "output"}
+        }
+    }
+}
+
+run {
+    if (project.hasProperty("auth")) {
+        jvmArgs '-Dauth='+auth
+    }
+    if (System.getProperty('DEBUG', 'false') == 'true') {
+        jvmArgs '-Xdebug',
+            '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5007'
+    }
+}
+
+configurations {
+    runtime.exclude group: "org.slf4j", module: "slf4j-simple"
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.21'
+    compile 'com.sparkjava:spark-core:2.4'
+ 	compile 'com.google.guava:guava:19.0'
+    compile 'org.flywaydb:flyway-core:4.0'
+    compile 'org.postgresql:postgresql:9.4.1208'
+    compile 'org.jdbi:jdbi:2.73'
+    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.mchange:c3p0:0.9.5.2'
+    compile 'org.apache.httpcomponents:httpclient:4.5.2'
+	compile 'com.ning:async-http-client:1.9.38'
+	compile 'org.apache.commons:commons-lang3:3.4'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:3.4.1'
+    testCompile 'com.jayway.jsonpath:json-path-assert:2.2.0'
+    testCompile 'com.jayway.restassured:rest-assured:2.9.0'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+
+    runtime 'ch.qos.logback:logback-classic:1.1.7'
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Inativ Collect Conso'
+        attributes 'Main-Class': "$mainClass"
+    }
+}
+
+mainClassName = "$mainClass"
+
+apply plugin: 'jacoco'
+jacoco {
+    toolVersion = "0.7.5.201505241946"
+}
+
+apply plugin: 'org.sonarqube'
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.0.1"
+  }
+}
+
+sonarqube {
+    properties {
+        property "sonar.host.url", "http://192.168.1.62:8989"
+    }
+}
+
+apply plugin: 'com.github.ben-manes.versions'
+buildscript {
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
+  }
+}

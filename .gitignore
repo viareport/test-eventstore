@@ -1,0 +1,9 @@
+# Ignore all dotfiles...
+.*
+# except for .gitignore
+!.gitignore
+
+# Ignore Gradle working directory #
+/bin/
+/build/
+/logs/
