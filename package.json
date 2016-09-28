@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/viareport/test-eventstore#readme",
   "dependencies": {
-    "event-store-client": "0.0.10"
+    "event-store-client": "0.0.10",
+    "express": "*",
+    "body-parser": "*",
+    "requirejs": "*"
   }
 }
