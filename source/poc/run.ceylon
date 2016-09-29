@@ -1,9 +1,26 @@
 import ceylon.json {
 	Object
 }
+import spark {
+	Spark,
+	Request,
+	Response,
+	Route
+}
+
+native shared void run();
 
 "Run the module `poc`."
-shared void run() {
-	Object openContratCommand = Object { "reference"->"ref1", "label"->"label" };
-	Object changeLabelContratCommand = Object { "reference"->"ref1", "label"->"label3" };
+native ("jvm") shared void run() {
+	
+	// Youhou on lance Spark
+	Spark.get("/hello", MaRoute());
+}
+
+native ("jvm") class MaRoute() satisfies Route {
+	shared actual Object? handle(Request request, Response response) {
+		response.status(200);
+		response.type("application/json");
+		return Object { "hello"->"world" };
+	}
 }

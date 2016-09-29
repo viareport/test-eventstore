@@ -45,6 +45,7 @@ class Contrat {
 		}
 		else {}
 		
+		
 		uncommitedEvents.add(evt);
 	}
 }
